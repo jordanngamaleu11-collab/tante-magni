@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Tante Magni</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" defer></script>
+
+  <!-- Vapeur sur les cartes -->
+  <style>
+    .menu-link-card{display:block; position:relative; border-radius:22px; overflow:hidden}
+    .menu-link-card .steam{
+      position:absolute; left:50%; bottom:18%;
+      width:18px; height:44px; border-radius:22px;
+      background:rgba(255,255,255,.35);
+      filter:blur(6px);
+      transform:translateX(-50%);
+      animation:steam 2.6s infinite ease-in-out;
+      pointer-events:none;
+      z-index:2;
+    }
+    .menu-link-card .s2{left:35%; animation-delay:.55s; opacity:.22}
+    .menu-link-card .s3{left:65%; animation-delay:1.1s; opacity:.18}
+    @keyframes steam{
+      0%{transform:translate(-50%,0) scale(1);opacity:0}
+      20%{opacity:.45}
+      100%{transform:translate(-50%,-95px) scale(1.6);opacity:0}
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loader -->
+  <div class="loader">
+    <img src="assets/images/logo-tante-magni.png" alt="Logo Tante Magni" class="loader-logo">
+  </div>
+
+  <!-- Hero -->
+  <header class="hero" id="top">
+    <!-- Topbar version “Plats-like” -->
+    <nav class="topbar">
+      <a class="brand" href="#top" aria-label="Accueil">
+        <img src="assets/images/logo-tante-magni.png" alt="Tante Magni" class="brand-logo">
+        <span class="brand-name">Tante Magni</span>
+      </a>
+
+      <div class="nav">
+        <a class="active" href="index.html">Accueil</a>
+        <a href="plats/index.html">Plats</a>
+        <a href="#reservation">Réserver</a>
+        <a href="#about">À propos</a>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+      <p class="eyebrow">Cuisine camerounaise • Élégance • Authenticité</p>
+      <h1>La cuisine camerounaise<br>dans toute son élégance</h1>
+      <p class="sub">Un restaurant chaleureux, des saveurs puissantes, une expérience raffinée.</p>
+
+      <div class="hero-actions">
+        <a href="#reservation" class="btn primary">Réserver une table</a>
+        <a href="#menu" class="btn ghost">Visiter notre menu</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- À propos -->
+  <section class="section reveal" id="about">
+    <div class="container">
+      <h2>L’âme de Tante Magni</h2>
+      <p class="lead">
+        Tante Magni célèbre la générosité, le partage et l’authenticité
+        de la cuisine camerounaise dans un cadre élégant et chaleureux.
+      </p>
+    </div>
+  </section>
+
+  <!-- Menu -->
+  <section class="section" id="menu">
+    <div class="container">
+      <h2 class="reveal">Notre Menu</h2>
+
+      <div class="menu-grid">
+        <a class="menu-link-card" href="plats/index.html" aria-label="Voir les plats">
+          <span class="steam s1"></span><span class="steam s2"></span><span class="steam s3"></span>
+
+          <article class="menu-item reveal">
+            <img src="assets/images/ndole-royale.jpeg" alt="Ndolé Royal">
+            <div class="menu-overlay">
+              <h3>Ndolé Royal</h3>
+              <p>Découvrir les plats</p>
+            </div>
+          </article>
+        </a>
+
+        <a class="menu-link-card" href="plats/index.html" aria-label="Voir les plats">
+          <span class="steam s1"></span><span class="steam s2"></span><span class="steam s3"></span>
+
+          <article class="menu-item reveal">
+            <img src="assets/images/poulet-dg.jpeg" alt="Poulet DG">
+            <div class="menu-overlay">
+              <h3>Poulet DG</h3>
+              <p>Découvrir les plats</p>
+            </div>
+          </article>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Réservation -->
+  <section class="section reveal" id="reservation">
+    <div class="container">
+      <h2>Réservation</h2>
+
+      <form class="reservation-form" id="reservationForm">
+        <div class="grid-2">
+          <input type="text" name="nom" placeholder="Nom" required>
+          <input type="email" name="email" placeholder="Email" required autocomplete="email">
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="countryCode">Indicatif</label>
+            <select id="countryCode" name="countryCode" required>
+              <option value="+237" selected>Cameroun (+237)</option>
+              <option value="+33">France (+33)</option>
+              <option value="+1">Canada / USA (+1)</option>
+              <option value="+44">UK (+44)</option>
+              <option value="+49">Allemagne (+49)</option>
+              <option value="+234">Nigeria (+234)</option>
+              <option value="+225">Côte d’Ivoire (+225)</option>
+              <option value="+221">Sénégal (+221)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="localPhone">Numéro</label>
+            <input
+              type="tel"
+              id="localPhone"
+              name="localPhone"
+              placeholder="Ex: 690123456"
+              required
+              inputmode="tel"
+              autocomplete="tel"
+              pattern="[0-9\s()-]{6,20}"
+              title="Entre un numéro valide (ex: 690123456)"
+            >
+          </div>
+        </div>
+
+        <input type="hidden" id="phone" name="phone">
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="people">Personnes</label>
+            <input type="number" id="people" name="people" min="1" max="20" placeholder="Nombre de personnes" required>
+          </div>
+
+          <div class="field">
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="time">Heure</label>
+            <input type="time" id="time" name="time" required>
+          </div>
+
+          <div class="field">
+            <label for="service">Service</label>
+            <input type="text" id="service" name="service" placeholder="Optionnel (Déjeuner/Dîner)">
+          </div>
+        </div>
+
+        <textarea name="message" rows="4" placeholder="Message (allergies, demande spéciale, etc.)"></textarea>
+
+        <button type="submit" class="btn primary">Envoyer la réservation</button>
+        <p class="form-hint muted" id="formHint"></p>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> Tante Magni — Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/script.js"></script>
+</body>
+</html>

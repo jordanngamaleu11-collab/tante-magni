@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Plats — Tante Magni</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- ✅ CSS séparé -->
+  <link rel="stylesheet" href="./plats.css">
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <img src="../assets/images/logo-tante-magni.png" alt="Tante Magni" onerror="this.style.display='none'">
+        <div>Tante Magni</div>
+      </div>
+
+      <div class="nav">
+        <a href="../index.html">Accueil</a>
+        <a href="./index.html" class="active">Plats</a>
+        <a href="../index.html#reservation">Réserver</a>
+        <a href="../index.html#about">À propos</a>
+      </div>
+    </div>
+
+    <h1>Choisissez vos plats 🍽️</h1>
+    <p class="sub">
+      Choisis un jour (Lun → Sam), puis compose ton plat : <b>Sauce</b> → <b>Accompagnement</b> → <b>Compléments</b>.
+      (Mix max 2 pour sauces et compléments)
+    </p>
+
+    <div class="hero-grid">
+      <div class="hero">
+        <h2>Une commande qui donne faim 😋</h2>
+        <p>Choisis d’abord un jour, puis sélectionne tes éléments en images.</p>
+
+        <div class="actions actions--mt">
+          <a class="btn orange" href="#jours">Choisir un jour</a>
+          <a class="btn ghost" href="../index.html#reservation">Réserver une table</a>
+        </div>
+      </div>
+
+      <a class="img-card" href="#jours" aria-label="Descendre vers le choix des jours">
+        <img src="../assets/images/hero.png" alt="Hero" onerror="this.src='../assets/images/ndole-royale.jpeg'">
+        <span class="steam s1"></span><span class="steam s2"></span><span class="steam s3"></span>
+        <div class="label">Voir les plats</div>
+      </a>
+    </div>
+
+    <div id="jours" class="days"></div>
+
+    <div class="stepbar">
+      <div id="pill-sauce" class="pill on">1) Sauce</div>
+      <div id="pill-acc" class="pill">2) Accompagnement</div>
+      <div id="pill-comp" class="pill">3) Compléments</div>
+      <div id="pill-cart" class="pill">4) Panier</div>
+    </div>
+
+    <div id="panel" class="panel"></div>
+    <div id="message" class="msg"></div>
+  </div>
+
+  <!-- ✅ JS séparé -->
+  <script src="./plats.js"></script>
+</body>
+</html>
