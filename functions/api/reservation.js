@@ -1,90 +1,109 @@
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
+    const body = await request.json();
 
-    // 1) Lire le JSON
-    const body = await request.json().catch(() => null);
-    if (!body) return json({ error: "JSON invalide" }, 400);
+    const plats = Array.isArray(body.plats) ? body.plats : [];
+    const dayLabel =
+      body.dayLabel ||
+      plats?.[0]?.dayLabel ||
+      body?.reservation?.dayLabel ||
+      "Non précisé";
 
-    // 2) Validation champs obligatoires
-    const required = ["nom", "email", "phone", "people", "date", "time"];
-    for (const key of required) {
-      if (!body[key] || String(body[key]).trim() === "") {
-        return json({ error: `Champ manquant : ${key}` }, 400);
+    const required = ["nom", "telephone", "email", "personnes", "heure", "allergies"];
+    for (const k of required) {
+      if (body[k] === undefined || body[k] === null || String(body[k]).trim() === "") {
+        return json({ ok: false, error: `Champ manquant : ${k}` }, 400);
       }
     }
+    if (!plats.length) {
+      return json({ ok: false, error: "Aucun plat sélectionné" }, 400);
+    }
 
-    // 3) Nettoyage simple
-    const nom = String(body.nom).trim();
-    const email = String(body.email).trim();
-    const phone = String(body.phone).trim();
-    const people = String(body.people).trim();
-    const date = String(body.date).trim();
-    const time = String(body.time).trim();
-    const service = String(body.service || "").trim();
-    const message = String(body.message || "").trim();
+    const OWNER_EMAIL = env.OWNER_EMAIL || "jordan.ngamaleu.work@gmail.com";
+    const FROM_EMAIL = env.FROM_EMAIL || "Tante Magni <onboarding@resend.dev>";
+    const RESEND_API_KEY = env.RESEND_API_KEY;
 
-    const text =
-`Nouvelle réservation - Tante Magni
+    if (!RESEND_API_KEY) {
+      return json({ ok: false, error: "RESEND_API_KEY manquant côté Cloudflare" }, 500);
+    }
 
-Nom: ${nom}
-Email: ${email}
-Téléphone: ${phone}
-Personnes: ${people}
-Date: ${date}
-Heure: ${time}
-Service: ${service || "-"}
-Message: ${message || "-"}`;
+    const subject = `🍽️ Réservation — ${body.nom} — ${dayLabel} — ${body.heure}`;
 
-    // ⚠️ IMPORTANT (test Resend) :
-    // Mets TON email Resend ici pour tester d'abord.
-    // Ensuite on changera vers dragonhousefamily@gmail.com.
-    const DESTINATION_TEST = "jordanngamaleu11@gmail.com";
+    const platsTxt = plats
+      .map((p, i) => {
+        const sauce = p.sauce?.label || p.sauce || "—";
+        const acc = p.accompagnement?.label || p.accompagnement || "—";
+        const comps = Array.isArray(p.complements)
+          ? p.complements.map((c) => c.label || c).join(", ")
+          : (p.complements?.label || p.complements || "—");
+        const d = p.dayLabel || dayLabel;
+        return `Plat #${i + 1} — ${d}\n- Sauce: ${sauce}\n- Accompagnement: ${acc}\n- Compléments: ${comps}`;
+      })
+      .join("\n\n");
 
-    await sendEmailResend(env, {
-      to: DESTINATION_TEST,
-      subject: "Nouvelle réservation - Tante Magni",
-      text
+    const text = `
+RÉSERVATION
+
+Jour: ${dayLabel}
+
+Client:
+- Nom: ${body.nom}
+- Téléphone: ${body.telephone}
+- Email: ${body.email}
+- Nombre de personnes: ${body.personnes}
+- Heure: ${body.heure}
+- Allergies: ${body.allergies}
+- Commentaire: ${body.commentaire || "—"}
+
+Plats:
+${platsTxt}
+`.trim();
+
+    const resp = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: [OWNER_EMAIL],
+        subject,
+        text,
+      }),
     });
 
-    return json({ ok: true }, 200);
+    const data = await resp.json();
+    if (!resp.ok) {
+      return json({ ok: false, error: data?.message || "Erreur Resend", details: data }, 500);
+    }
+
+    return json({ ok: true, message: "Réservation envoyée ✅", data }, 200);
   } catch (e) {
-    // On renvoie le vrai message d'erreur pour comprendre
-    return json({ error: String(e?.message || e) }, 500);
+    return json({ ok: false, error: e?.message || "Erreur serveur" }, 500);
   }
 }
 
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { "Content-Type": "application/json; charset=utf-8" }
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
   });
 }
 
-async function sendEmailResend(env, { to, subject, text }) {
-  if (!env.RESEND_API_KEY) throw new Error("RESEND_API_KEY manquante dans Cloudflare");
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
     headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      "Content-Type": "application/json"
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
     },
-    body: JSON.stringify({
-      // expéditeur test Resend
-      from: "onboarding@resend.dev",
-      to: [to],
-      subject,
-      text
-    })
   });
-
-  // ✅ Ici on récupère le message exact de Resend
-  const responseText = await res.text().catch(() => "");
-
-  if (!res.ok) {
-    throw new Error(`Resend error ${res.status}: ${responseText}`);
-  }
-
-  return true;
 }
